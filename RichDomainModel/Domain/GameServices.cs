@@ -53,26 +53,7 @@ namespace RichDomainModel.Domain
             // We use Game repository, but it is not rare to see Player repository or GameQuestion repository
             // => accessing directly entities out of the Game agregate
             var game = gameRepository.Get(gameId);
-            CheckPlayable(game);
-            CheckPlayerTurn(playerId, game);
-            if (game.CurrentPlayer.LastQuestion != null)
-                throw new Exception("Player already moved, need to answer now");
-
-            var diceRoll = dice.Roll();
-            GameQuestion questionToAsk = null;
-            if (game.CurrentPlayer.IsInPenaltyBox && diceRoll % 2 == 0)
-            {
-                NextPlayerTurn(game);
-            }
-            else
-            {
-                game.CurrentPlayer.IsInPenaltyBox = false;
-                game.CurrentPlayer.Place = (game.CurrentPlayer.Place + diceRoll) % 12;
-                questionToAsk = game.Categories[game.CurrentPlayer.Place % game.Categories.Count]
-                    .Questions.First(x => x.NotUsed);
-                questionToAsk.NotUsed = false;
-                game.CurrentPlayer.LastQuestion = questionToAsk.Question;
-            }
+            var questionToAsk = game.Move(dice, playerId);
             gameRepository.Save(game);
             return questionToAsk?.Question;
         }
@@ -80,34 +61,9 @@ namespace RichDomainModel.Domain
         public bool Answer(int gameId, int playerId, string answer)
         {
             var game = gameRepository.Get(gameId);
-            CheckPlayable(game);
-            CheckPlayerTurn(playerId, game);
-            var goodAnswer = game.CurrentPlayer.LastQuestion.Answer == answer;
-            if (goodAnswer)
-                game.CurrentPlayer.GoldCoins++;
-            else
-                game.CurrentPlayer.IsInPenaltyBox = true;
-            game.CurrentPlayer.LastQuestion = null;
-            NextPlayerTurn(game);
+            var goodAnswer = game.Answer(playerId, answer);
             gameRepository.Save(game);
             return goodAnswer;
-        }
-
-        private static void CheckPlayable(Game game)
-        {
-            if (game.Players.Count < 2)
-                throw new Exception($"Game cannot be played with {game.Players.Count} players, at least 2 required");
-        }
-
-        private static void CheckPlayerTurn(int playerId, Game game)
-        {
-            if (game.CurrentPlayer.Id != playerId)
-                throw new Exception($"It is not {playerId} turn!");
-        }
-
-        private static void NextPlayerTurn(Game game)
-        {
-            game.CurrentPlayer = game.Players[(game.Players.IndexOf(game.CurrentPlayer) + 1) % game.Players.Count];
         }
     }
 }
