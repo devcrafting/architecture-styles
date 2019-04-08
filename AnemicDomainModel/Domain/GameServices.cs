@@ -11,13 +11,16 @@ namespace AnemicDomainModel.Domain
         // - eager loading defined in GetXXX methods (less impact if we do a real agregate repository)
         private readonly IGameRepository gameRepository;
         private readonly IQuestionRepository questionRepository;
+        private readonly IRollDice dice;
 
         public GameServices(
             IGameRepository gameRepository,
-            IQuestionRepository questionRepository)
+            IQuestionRepository questionRepository,
+            IRollDice dice)
         {
             this.gameRepository = gameRepository;
             this.questionRepository = questionRepository;
+            this.dice = dice;
         }
 
         public Game StartNewGame(string name, IEnumerable<string> categories)
@@ -76,7 +79,7 @@ namespace AnemicDomainModel.Domain
             if (game.CurrentPlayer.LastQuestion != null)
                 throw new Exception("Player already moved, need to answer now");
 
-            var diceRoll = new Random().Next(1, 6);
+            var diceRoll = dice.Roll();
             GameQuestion questionToAsk = null;
             if (game.CurrentPlayer.IsInPenaltyBox && diceRoll % 2 == 0)
             {

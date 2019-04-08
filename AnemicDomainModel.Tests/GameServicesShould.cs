@@ -14,7 +14,7 @@ namespace AnemicDomainModel.Tests
         {
             var gameRepository = new InMemoryGameRepository();
             var questionsRepository = new FakeQuestionsRepository();
-            var gameServices = new GameServices(gameRepository, questionsRepository);
+            var gameServices = new GameServices(gameRepository, questionsRepository, null);
 
             var game = gameServices.StartNewGame("test", new [] { "Sports", "Science" });
 
@@ -30,7 +30,7 @@ namespace AnemicDomainModel.Tests
         {
             var gameRepository = new InMemoryGameRepository();
             var questionsRepository = new FakeQuestionsRepository();
-            var gameServices = new GameServices(gameRepository, questionsRepository);
+            var gameServices = new GameServices(gameRepository, questionsRepository, null);
 
             Check.ThatCode(() => gameServices.StartNewGame("test", new string[] { }))
                 .Throws<Exception>();
@@ -45,7 +45,7 @@ namespace AnemicDomainModel.Tests
                 Players = new List<Player>(),
             };
             var gameRepository = new InMemoryGameRepository(game);
-            var gameServices = new GameServices(gameRepository, null);
+            var gameServices = new GameServices(gameRepository, null, null);
 
             gameServices.AddPlayer(game.Id, "player1");
 
@@ -65,7 +65,7 @@ namespace AnemicDomainModel.Tests
                 CurrentPlayer = player1
             };
             var gameRepository = new InMemoryGameRepository(game);
-            var gameServices = new GameServices(gameRepository, null);
+            var gameServices = new GameServices(gameRepository, null, null);
 
             gameServices.AddPlayer(game.Id, "player2");
 
@@ -91,7 +91,8 @@ namespace AnemicDomainModel.Tests
                             new GameQuestion { NotUsed = true, Question = new Question { CategoryId = 1, Text = "test question"} } } }}
             };
             var gameRepository = new InMemoryGameRepository(game);
-            var gameServices = new GameServices(gameRepository, null);
+            var fakeDice = new FakeDice(2);
+            var gameServices = new GameServices(gameRepository, null, fakeDice);
 
             var question = gameServices.Move(game.Id, player1.Id);
 
@@ -100,7 +101,7 @@ namespace AnemicDomainModel.Tests
             Check.That(gameQuestion.NotUsed).IsFalse();
             Check.That(game.CurrentPlayer.IsInPenaltyBox).IsFalse();
             Check.That(game.CurrentPlayer.LastQuestion).IsEqualTo(question);
-            Check.That(game.CurrentPlayer.Place).IsNotEqualTo(0);
+            Check.That(game.CurrentPlayer.Place).IsEqualTo(2);
         }
 
         [Fact]
@@ -114,7 +115,7 @@ namespace AnemicDomainModel.Tests
                 Players = new List<Player> { player1 }
             };
             var gameRepository = new InMemoryGameRepository(game);
-            var gameServices = new GameServices(gameRepository, null);
+            var gameServices = new GameServices(gameRepository, null, null);
 
             Check.ThatCode(() => gameServices.Move(game.Id, player1.Id))
                 .Throws<Exception>().WithMessage("Game cannot be played with 1 players, at least 2 required");
@@ -133,7 +134,7 @@ namespace AnemicDomainModel.Tests
                 CurrentPlayer = player1
             };
             var gameRepository = new InMemoryGameRepository(game);
-            var gameServices = new GameServices(gameRepository, null);
+            var gameServices = new GameServices(gameRepository, null, null);
 
             Check.ThatCode(() => gameServices.Move(game.Id, player2.Id))
                 .Throws<Exception>().WithMessage("It is not 2 turn!");
@@ -152,7 +153,7 @@ namespace AnemicDomainModel.Tests
                 CurrentPlayer = player1
             };
             var gameRepository = new InMemoryGameRepository(game);
-            var gameServices = new GameServices(gameRepository, null);
+            var gameServices = new GameServices(gameRepository, null, null);
 
             Check.ThatCode(() => gameServices.Move(game.Id, player1.Id))
                 .Throws<Exception>().WithMessage("Player already moved, need to answer now");

@@ -34,7 +34,8 @@ namespace AnemicDomainModel
                 options => options.UseSqlite(connection))
                 .AddTransient<GameServices>()
                 .AddTransient<IGameRepository, GameRepository>()
-                .AddTransient<IQuestionRepository, QuestionRepository>();
+                .AddTransient<IQuestionRepository, QuestionRepository>()
+                .AddTransient<IRollDice, RandomDice>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
