@@ -157,6 +157,73 @@ namespace AnemicDomainModel.Tests
             Check.That(game.CurrentPlayer.Place).IsEqualTo(3);
         }
 
+        [Fact]
+        public void AnswerCorrectly()
+        {
+            var player1 = new Player {
+                Name = "player1",
+                LastQuestion = new Question { Answer = "answer" }
+            };
+            var player2 = new Player { Name = "player2" };
+            var game = GetGame(player1, player2);
+            var gameRepository = new InMemoryGameRepository(game);
+            var gameServices = new GameServices(gameRepository, null, null);
+
+            var answer = gameServices.Answer(game.Id, player1.Id, "answer");
+
+            Check.That(answer).IsTrue();
+            Check.That(player1.LastQuestion).IsNull();
+            Check.That(player1.GoldCoins).IsEqualTo(1);
+            Check.That(player1.IsInPenaltyBox).IsFalse();
+            Check.That(game.CurrentPlayer).IsEqualTo(player2);
+        }
+
+        [Fact]
+        public void AnswerIncorrectly()
+        {
+            var player1 = new Player {
+                Name = "player1",
+                LastQuestion = new Question { Answer = "answer" }
+            };
+            var player2 = new Player { Name = "player2" };
+            var game = GetGame(player1, player2);
+            var gameRepository = new InMemoryGameRepository(game);
+            var gameServices = new GameServices(gameRepository, null, null);
+
+            var answer = gameServices.Answer(game.Id, player1.Id, "bad answer");
+
+            Check.That(answer).IsFalse();
+            Check.That(player1.LastQuestion).IsNull();
+            Check.That(player1.GoldCoins).IsEqualTo(0);
+            Check.That(player1.IsInPenaltyBox).IsTrue();
+            Check.That(game.CurrentPlayer).IsEqualTo(player2);
+        }
+
+        [Fact]
+        public void FailToAnswerWhenNotEnoughPlayers()
+        {
+            var player1 = new Player { Name = "player1" };
+            var game = GetGame(player1);
+            var gameRepository = new InMemoryGameRepository(game);
+            var gameServices = new GameServices(gameRepository, null, null);
+
+            Check.ThatCode(() => gameServices.Answer(game.Id, player1.Id, "answer"))
+                .Throws<Exception>().WithMessage("Game cannot be played with 1 players, at least 2 required");
+        }
+
+        [Fact]
+        public void FailToAnswerWhenNotTheCurrentPlayer()
+        {
+            var player1 = new Player { Id = 1, Name = "player1" };
+            var player2 = new Player { Id = 2, Name = "player2" };
+            var game = GetGame(player1, player2);
+            var gameRepository = new InMemoryGameRepository(game);
+            var gameServices = new GameServices(gameRepository, null, null);
+
+            Check.ThatCode(() => gameServices.Answer(game.Id, player2.Id, "bad answer"))
+                .Throws<Exception>().WithMessage("It is not 2 turn!");
+        }
+
         private static Game GetGame(params Player[] players)
         {
             return new Game
