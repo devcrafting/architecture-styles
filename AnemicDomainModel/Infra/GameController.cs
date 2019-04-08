@@ -33,7 +33,7 @@ namespace AnemicDomainModel.Infra
         [HttpPost]
         public string Move(int gameId, int playerId)
         {
-            return gameServices.Move(gameId, playerId);
+            return gameServices.Move(gameId, playerId).Text;
         }
 
         [HttpPost]

@@ -66,7 +66,7 @@ namespace AnemicDomainModel.Domain
             gameRepository.Save(game);
         }
 
-        public string Move(int gameId, int playerId)
+        public Question Move(int gameId, int playerId)
         {
             // We use Game repository, but it is not rare to see Player repository or GameQuestion repository
             // => accessing directly entities out of the Game agregate
@@ -92,7 +92,7 @@ namespace AnemicDomainModel.Domain
                 game.CurrentPlayer.LastQuestion = questionToAsk.Question;
             }
             gameRepository.Save(game);
-            return questionToAsk?.Question.Text;
+            return questionToAsk?.Question;
         }
 
         public bool Answer(int gameId, int playerId, string answer)
