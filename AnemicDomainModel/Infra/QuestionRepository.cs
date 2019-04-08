@@ -13,9 +13,9 @@ namespace AnemicDomainModel.Infra
             this.dbContext = dbContext;
         }
 
-        public List<Question> GetRandomForCategory(string categoryName)
+        public List<Question> GetRandomForCategory(string categoryName, int nbQuestions)
         {
-            return dbContext.Question.Take(50).ToList();
+            return dbContext.Question.Take(nbQuestions).ToList();
         }
     }
 }

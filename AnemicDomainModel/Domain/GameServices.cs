@@ -20,7 +20,7 @@ namespace AnemicDomainModel.Domain
             this.questionRepository = questionRepository;
         }
 
-        public int NewGame(string name, IEnumerable<string> categories)
+        public Game StartNewGame(string name, IEnumerable<string> categories)
         {
             if (!categories.Any())
                 throw new Exception("You should choose at least one questions' category");
@@ -28,14 +28,14 @@ namespace AnemicDomainModel.Domain
             var game = new Game { Name = name, Categories = new List<GameCategory>() };
             foreach (var categoryName in categories)
             {
-                var questions = questionRepository.GetRandomForCategory(categoryName)
+                var questions = questionRepository.GetRandomForCategory(categoryName, 50)
                     .Select(q => new GameQuestion { Question = q, NotUsed = true })
                     .ToList();
                 var category = new GameCategory { Name = categoryName, Questions = questions };
                 game.Categories.Add(category);
             }
             gameRepository.Save(game);
-            return game.Id;
+            return game;
         }
 
         public List<Game> GetGames()

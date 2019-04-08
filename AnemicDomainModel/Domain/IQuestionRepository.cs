@@ -4,6 +4,6 @@ namespace AnemicDomainModel.Domain
 {
     public interface IQuestionRepository
     {
-        List<Question> GetRandomForCategory(string categoryName);
+        List<Question> GetRandomForCategory(string categoryName, int nbQuestions);
     }
 }

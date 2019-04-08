@@ -16,7 +16,7 @@ namespace AnemicDomainModel.Infra
         [HttpPost]
         public int NewGame(string name, IEnumerable<string> categories)
         {
-            return gameServices.NewGame(name, categories);
+            return gameServices.StartNewGame(name, categories).Id;
         }
 
         public List<Game> Games()
