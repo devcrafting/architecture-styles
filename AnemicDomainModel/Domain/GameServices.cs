@@ -43,7 +43,7 @@ namespace AnemicDomainModel.Domain
             return gameRepository.GetGames();
         }
 
-        internal void AddPlayer(int gameId, string playerName)
+        public void AddPlayer(int gameId, string playerName)
         {
             // NB: we load Game as an agregate root (i.e always with the same eager loading strategy behind Get method)
             // It is clearly not really common in "Anemic Domain Model"-oriented architecture
