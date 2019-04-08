@@ -39,11 +39,7 @@ namespace AnemicDomainModel.Tests
         [Fact]
         public void AddFirstPlayer()
         {
-            var game = new Game {
-                Id = 1,
-                Name = "test",
-                Players = new List<Player>(),
-            };
+            var game = GetGame();
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
 
@@ -57,13 +53,7 @@ namespace AnemicDomainModel.Tests
         public void AddAnotherPlayerWithoutChangingCurrentPlayer()
         {
             var player1 = new Player { Name = "player1" };
-            var game = new Game
-            {
-                Id = 1,
-                Name = "test",
-                Players = new List<Player> { player1 },
-                CurrentPlayer = player1
-            };
+            var game = GetGame(player1);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
 
@@ -78,18 +68,7 @@ namespace AnemicDomainModel.Tests
         {
             var player1 = new Player { Name = "player1" };
             var player2 = new Player { Name = "player2" };
-            var game = new Game
-            {
-                Id = 1,
-                Name = "test",
-                Players = new List<Player> { player1, player2 },
-                CurrentPlayer = player1,
-                Categories = new List<GameCategory> {
-                    new GameCategory {
-                        Id = 1,
-                        Questions = new List<GameQuestion> {
-                            new GameQuestion { NotUsed = true, Question = new Question { CategoryId = 1, Text = "test question"} } } }}
-            };
+            Game game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var fakeDice = new FakeDice(2);
             var gameServices = new GameServices(gameRepository, null, fakeDice);
@@ -108,12 +87,7 @@ namespace AnemicDomainModel.Tests
         public void FailToMoveCurrentPlayerWhenLessThan2Players()
         {
             var player1 = new Player { Name = "player1" };
-            var game = new Game
-            {
-                Id = 1,
-                Name = "test",
-                Players = new List<Player> { player1 }
-            };
+            var game = GetGame(player1);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
 
@@ -126,13 +100,7 @@ namespace AnemicDomainModel.Tests
         {
             var player1 = new Player { Id = 1, Name = "player1" };
             var player2 = new Player { Id = 2, Name = "player2" };
-            var game = new Game
-            {
-                Id = 1,
-                Name = "test",
-                Players = new List<Player> { player1, player2 },
-                CurrentPlayer = player1
-            };
+            var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
 
@@ -145,18 +113,64 @@ namespace AnemicDomainModel.Tests
         {
             var player1 = new Player { Id = 1, Name = "player1", LastQuestion = new Question() };
             var player2 = new Player { Id = 2, Name = "player2" };
-            var game = new Game
-            {
-                Id = 1,
-                Name = "test",
-                Players = new List<Player> { player1, player2 },
-                CurrentPlayer = player1
-            };
+            var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
 
             Check.ThatCode(() => gameServices.Move(game.Id, player1.Id))
                 .Throws<Exception>().WithMessage("Player already moved, need to answer now");
+        }
+
+        [Fact]
+        public void DoNotMoveCurrentPlayerIfInPenaltyBoxAndRollEvenDice()
+        {
+            var player1 = new Player { Name = "player1", IsInPenaltyBox = true };
+            var player2 = new Player { Name = "player2" };
+            var game = GetGame(player1, player2);
+            var gameRepository = new InMemoryGameRepository(game);
+            var fakeDice = new FakeDice(2);
+            var gameServices = new GameServices(gameRepository, null, fakeDice);
+
+            var question = gameServices.Move(game.Id, player1.Id);
+
+            Check.That(question).IsNull();
+            Check.That(game.CurrentPlayer).IsEqualTo(player2);
+        }
+
+        [Fact]
+        public void MoveCurrentPlayerIfInPenaltyBoxButRollOddDice()
+        {
+            var player1 = new Player { Name = "player1", IsInPenaltyBox = true };
+            var player2 = new Player { Name = "player2" };
+            var game = GetGame(player1, player2);
+            var gameRepository = new InMemoryGameRepository(game);
+            var fakeDice = new FakeDice(3);
+            var gameServices = new GameServices(gameRepository, null, fakeDice);
+
+            var question = gameServices.Move(game.Id, player1.Id);
+
+            var gameQuestion = game.Categories.Single(x => x.Id == question.CategoryId).Questions.First();
+            Check.That(question.Text).IsEqualTo(gameQuestion.Question.Text);
+            Check.That(gameQuestion.NotUsed).IsFalse();
+            Check.That(game.CurrentPlayer.IsInPenaltyBox).IsFalse();
+            Check.That(game.CurrentPlayer.LastQuestion).IsEqualTo(question);
+            Check.That(game.CurrentPlayer.Place).IsEqualTo(3);
+        }
+
+        private static Game GetGame(params Player[] players)
+        {
+            return new Game
+            {
+                Id = 1,
+                Name = "test",
+                Players = players.ToList(),
+                CurrentPlayer = players.FirstOrDefault(),
+                Categories = new List<GameCategory> {
+                    new GameCategory {
+                        Id = 1,
+                        Questions = new List<GameQuestion> {
+                            new GameQuestion { NotUsed = true, Question = new Question { CategoryId = 1, Text = "test question"} } } }}
+            };
         }
     }
 }
