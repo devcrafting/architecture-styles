@@ -111,7 +111,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void FailToMovePlayerWhenLastQuestionNotAnswered()
         {
-            var player1 = new Player(1, "player1") { LastQuestion = new Question() };
+            var player1 = new Player(1, "player1", new Question());
             var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
@@ -124,7 +124,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void DoNotMoveCurrentPlayerIfInPenaltyBoxAndRollEvenDice()
         {
-            var player1 = new Player(1, "player1") { IsInPenaltyBox = true };
+            var player1 = new Player(1, "player1", true);
             var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
@@ -140,7 +140,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void MoveCurrentPlayerIfInPenaltyBoxButRollOddDice()
         {
-            var player1 = new Player(1, "player1") { IsInPenaltyBox = true };
+            var player1 = new Player(1, "player1", true);
             var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
@@ -160,9 +160,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void AnswerCorrectly()
         {
-            var player1 = new Player(1, "player1") {
-                LastQuestion = new Question { Answer = "answer" }
-            };
+            var player1 = new Player(1, "player1", new Question { Answer = "answer" });
             var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
@@ -180,9 +178,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void AnswerIncorrectly()
         {
-            var player1 = new Player(1, "player1") {
-                LastQuestion = new Question { Answer = "answer" }
-            };
+            var player1 = new Player(1, "player1", new Question { Answer = "answer" });
             var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);

@@ -8,7 +8,7 @@ namespace RichDomainModel.Domain
     {
         // Repositories are very thin (leaky) abstraction of the ORM in this case, leaky because we rely on:
         // - entities tracking of changes
-        // - eager loading defined in GetXXX methods (less impact if we do a real agregate repository)
+        // - eager loading defined in GetXXX methods (less impact if we do a real aggregate repository)
         private readonly IGameRepository gameRepository;
         private readonly IQuestionRepository questionRepository;
         private readonly IRollDice dice;
@@ -37,7 +37,7 @@ namespace RichDomainModel.Domain
 
         public void AddPlayer(int gameId, string playerName)
         {
-            // NB: we load Game as an agregate root (i.e always with the same eager loading strategy behind Get method)
+            // NB: we load Game as an aggregate root (i.e always with the same eager loading strategy behind Get method)
             // It is clearly not really common in "Anemic Domain Model"-oriented architecture
             // More often there are several GetWithXXX methods on the repository
             var game = gameRepository.Get(gameId);
@@ -51,7 +51,7 @@ namespace RichDomainModel.Domain
         public Question Move(int gameId, int playerId)
         {
             // We use Game repository, but it is not rare to see Player repository or GameQuestion repository
-            // => accessing directly entities out of the Game agregate
+            // => accessing directly entities out of the Game aggregate
             var game = gameRepository.Get(gameId);
             var questionToAsk = game.Move(dice, playerId);
             gameRepository.Save(game);

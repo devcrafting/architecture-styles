@@ -19,12 +19,22 @@ namespace RichDomainModel.Domain
             GoldCoins = 0;
         }
 
+        public Player(int id, string playerName, Question lastQuestion) : this(id, playerName)
+        {
+            LastQuestion = lastQuestion;
+        }
+
+        public Player(int id, string playerName, bool isInPenaltyBox) : this(id, playerName)
+        {
+            IsInPenaltyBox = isInPenaltyBox;
+        }
+
         public int Id { get; }
         public string Name { get; }
         public int Place { get; private set; }
-        public bool IsInPenaltyBox { get; set; } // setter for tests only
+        public bool IsInPenaltyBox { get; private set; }
         public int GoldCoins { get; private set; }
-        public Question LastQuestion { get; set; } // setter for tests only
+        public Question LastQuestion { get; private set; }
 
         internal void CheckCanMove()
         {
