@@ -6,11 +6,11 @@ namespace RichDomainModel.Domain
 {
     public class Game
     {
-        public int Id { get; private set; }
-        public string Name { get; private set; }
-        public List<Player> Players { get; private set; }
-        public Player CurrentPlayer { get; set; }
-        public List<GameCategory> Categories { get; private set; }
+        public int Id { get; }
+        public string Name { get; }
+        public List<Player> Players { get; }
+        public Player CurrentPlayer { get; private set; }
+        public List<GameCategory> Categories { get; }
 
         public Game(int id, string name, List<Player> players, Player currentPlayer, List<GameCategory> categories)
         {
@@ -41,15 +41,9 @@ namespace RichDomainModel.Domain
 
         internal void AddPlayer(string playerName)
         {
-            var player = new Player
-                {
-                    Name = playerName,
-                    Place = 0,
-                    IsInPenaltyBox = false,
-                    GoldCoins = 0
-                };
+            var player = new Player(playerName);
             if (!this.Players.Any())
-                this.CurrentPlayer = player; 
+                this.CurrentPlayer = player;
 
             this.Players.Add(player);
         }
@@ -58,23 +52,17 @@ namespace RichDomainModel.Domain
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
-            if (this.CurrentPlayer.LastQuestion != null)
-                throw new Exception("Player already moved, need to answer now");
+            CurrentPlayer.CheckCanMove();
 
             var diceRoll = dice.Roll();
             GameQuestion questionToAsk = null;
-            if (this.CurrentPlayer.IsInPenaltyBox && diceRoll % 2 == 0)
+            if (CurrentPlayer.CannotGoOutOfPenaltyBox(diceRoll))
             {
                 NextPlayerTurn();
             }
             else
             {
-                this.CurrentPlayer.IsInPenaltyBox = false;
-                this.CurrentPlayer.Place = (this.CurrentPlayer.Place + diceRoll) % 12;
-                questionToAsk = this.Categories[this.CurrentPlayer.Place % this.Categories.Count]
-                    .Questions.First(x => x.NotUsed);
-                questionToAsk.NotUsed = false;
-                this.CurrentPlayer.LastQuestion = questionToAsk.Question;
+                questionToAsk = CurrentPlayer.Move(diceRoll, Categories);
             }
             return questionToAsk;
         }
@@ -83,12 +71,7 @@ namespace RichDomainModel.Domain
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
-            var goodAnswer = this.CurrentPlayer.LastQuestion.Answer == answer;
-            if (goodAnswer)
-                this.CurrentPlayer.GoldCoins++;
-            else
-                this.CurrentPlayer.IsInPenaltyBox = true;
-            this.CurrentPlayer.LastQuestion = null;
+            var goodAnswer = CurrentPlayer.Answer(answer);
             NextPlayerTurn();
             return goodAnswer;
         }

@@ -52,7 +52,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void AddAnotherPlayerWithoutChangingCurrentPlayer()
         {
-            var player1 = new Player { Name = "player1" };
+            var player1 = new Player("player1");
             var game = GetGame(player1);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
@@ -66,8 +66,8 @@ namespace RichDomainModel.Tests
         [Fact]
         public void MoveCurrentPlayer()
         {
-            var player1 = new Player { Name = "player1" };
-            var player2 = new Player { Name = "player2" };
+            var player1 = new Player("player1");
+            var player2 = new Player("player2");
             Game game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var fakeDice = new FakeDice(2);
@@ -86,7 +86,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void FailToMoveCurrentPlayerWhenLessThan2Players()
         {
-            var player1 = new Player { Name = "player1" };
+            var player1 = new Player("player1");
             var game = GetGame(player1);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
@@ -98,8 +98,8 @@ namespace RichDomainModel.Tests
         [Fact]
         public void FailToMovePlayerWhenNotTheCurrentPlayer()
         {
-            var player1 = new Player { Id = 1, Name = "player1" };
-            var player2 = new Player { Id = 2, Name = "player2" };
+            var player1 = new Player(1, "player1");
+            var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
@@ -111,8 +111,8 @@ namespace RichDomainModel.Tests
         [Fact]
         public void FailToMovePlayerWhenLastQuestionNotAnswered()
         {
-            var player1 = new Player { Id = 1, Name = "player1", LastQuestion = new Question() };
-            var player2 = new Player { Id = 2, Name = "player2" };
+            var player1 = new Player(1, "player1") { LastQuestion = new Question() };
+            var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
@@ -124,8 +124,8 @@ namespace RichDomainModel.Tests
         [Fact]
         public void DoNotMoveCurrentPlayerIfInPenaltyBoxAndRollEvenDice()
         {
-            var player1 = new Player { Name = "player1", IsInPenaltyBox = true };
-            var player2 = new Player { Name = "player2" };
+            var player1 = new Player(1, "player1") { IsInPenaltyBox = true };
+            var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var fakeDice = new FakeDice(2);
@@ -140,8 +140,8 @@ namespace RichDomainModel.Tests
         [Fact]
         public void MoveCurrentPlayerIfInPenaltyBoxButRollOddDice()
         {
-            var player1 = new Player { Name = "player1", IsInPenaltyBox = true };
-            var player2 = new Player { Name = "player2" };
+            var player1 = new Player(1, "player1") { IsInPenaltyBox = true };
+            var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var fakeDice = new FakeDice(3);
@@ -160,11 +160,10 @@ namespace RichDomainModel.Tests
         [Fact]
         public void AnswerCorrectly()
         {
-            var player1 = new Player {
-                Name = "player1",
+            var player1 = new Player(1, "player1") {
                 LastQuestion = new Question { Answer = "answer" }
             };
-            var player2 = new Player { Name = "player2" };
+            var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
@@ -181,11 +180,10 @@ namespace RichDomainModel.Tests
         [Fact]
         public void AnswerIncorrectly()
         {
-            var player1 = new Player {
-                Name = "player1",
+            var player1 = new Player(1, "player1") {
                 LastQuestion = new Question { Answer = "answer" }
             };
-            var player2 = new Player { Name = "player2" };
+            var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
@@ -202,7 +200,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void FailToAnswerWhenNotEnoughPlayers()
         {
-            var player1 = new Player { Name = "player1" };
+            var player1 = new Player(1, "player1");
             var game = GetGame(player1);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
@@ -214,8 +212,8 @@ namespace RichDomainModel.Tests
         [Fact]
         public void FailToAnswerWhenNotTheCurrentPlayer()
         {
-            var player1 = new Player { Id = 1, Name = "player1" };
-            var player2 = new Player { Id = 2, Name = "player2" };
+            var player1 = new Player(1, "player1");
+            var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
@@ -227,7 +225,7 @@ namespace RichDomainModel.Tests
         private static Game GetGame(params Player[] players)
         {
             return new Game(
-                1, "test", players.ToList(), players.FirstOrDefault(), 
+                1, "test", players.ToList(), players.FirstOrDefault(),
                 new List<GameCategory> {
                     new GameCategory {
                         Id = 1,
