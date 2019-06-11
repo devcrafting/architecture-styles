@@ -15,7 +15,7 @@ namespace RichDomainModel.Infra
 
         public List<Question> GetRandomForCategory(string categoryName, int nbQuestions)
         {
-            return dbContext.Question.Take(nbQuestions).ToList();
+            return dbContext.Question.Where(q => q.Category.Name == categoryName).Take(nbQuestions).ToList();
         }
     }
 }

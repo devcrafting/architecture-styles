@@ -15,7 +15,7 @@ namespace RichDomainModel.Infra
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var sport = new Category { Id = 1, Name = "Sports" };
+            var sport = new Category(1, "Sports");
             modelBuilder.Entity<Category>().HasData(sport);
 
             modelBuilder.Entity<Question>(q =>
