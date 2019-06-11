@@ -4,6 +4,6 @@ namespace RichDomainModel.Domain
 {
     public interface IQuestionRepository
     {
-        List<Question> GetRandomForCategory(string categoryName, int nbQuestions);
+        IEnumerable<Question> GetRandomForCategory(string categoryName, int nbQuestions);
     }
 }

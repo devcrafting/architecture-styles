@@ -13,9 +13,12 @@ namespace RichDomainModel.Infra
             this.dbContext = dbContext;
         }
 
-        public List<Question> GetRandomForCategory(string categoryName, int nbQuestions)
+        public IEnumerable<Question> GetRandomForCategory(string categoryName, int nbQuestions)
         {
-            return dbContext.Question.Where(q => q.Category.Name == categoryName).Take(nbQuestions).ToList();
+            return dbContext.Question
+                .Where(q => q.Category.Name == categoryName)
+                .Take(nbQuestions)
+                .ToList();
         }
     }
 }
