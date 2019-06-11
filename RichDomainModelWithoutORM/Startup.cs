@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RichDomainModelWithoutORM.Domain;
@@ -22,9 +21,7 @@ namespace RichDomainModelWithoutORM
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            var connection = "Data Source=trivia.db";
-            services.AddDbContext<TriviaDbContext>(
-                options => options.UseSqlite(connection))
+            services
                 .AddTransient<GameServices>()
                 .AddTransient<IGameRepository, GameRepository>()
                 .AddTransient<IQuestionRepository, QuestionRepository>()

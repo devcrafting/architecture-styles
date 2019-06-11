@@ -29,6 +29,13 @@ namespace RichDomainModelWithoutORM.Domain
             IsInPenaltyBox = isInPenaltyBox;
         }
 
+        public Player(int id, string playerName, bool isInPenaltyBox, int place, int goldCoins, Question lastQuestion) : this(id, playerName, isInPenaltyBox)
+        {
+            Place = place;
+            GoldCoins = goldCoins;
+            LastQuestion = lastQuestion;
+        }
+
         public int Id { get; }
         public string Name { get; }
         public int Place { get; private set; }
