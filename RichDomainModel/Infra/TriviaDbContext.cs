@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using RichDomainModel.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +22,7 @@ namespace RichDomainModel.Infra
                 {
                     q.HasData(
                         Enumerable.Range(1, 100)
-                            .Select(i => new Question { Id = i, CategoryId = sport.Id, Text = $"Sport {i}", Answer = $"sport {i}" })
+                            .Select(i => new Question(i, sport.Id, $"Sport {i}", $"sport {i}"))
                     );
                 });
         }

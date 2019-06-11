@@ -111,7 +111,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void FailToMovePlayerWhenLastQuestionNotAnswered()
         {
-            var player1 = new Player(1, "player1", new Question());
+            var player1 = new Player(1, "player1", new Question(1, 1, "some question", "its answer"));
             var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
@@ -160,13 +160,13 @@ namespace RichDomainModel.Tests
         [Fact]
         public void AnswerCorrectly()
         {
-            var player1 = new Player(1, "player1", new Question { Answer = "answer" });
+            var player1 = new Player(1, "player1", new Question(1, 1, "some question", "its answer"));
             var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
             var gameServices = new GameServices(gameRepository, null, null);
 
-            var answer = gameServices.Answer(game.Id, player1.Id, "answer");
+            var answer = gameServices.Answer(game.Id, player1.Id, "its answer");
 
             Check.That(answer).IsTrue();
             Check.That(player1.LastQuestion).IsNull();
@@ -178,7 +178,7 @@ namespace RichDomainModel.Tests
         [Fact]
         public void AnswerIncorrectly()
         {
-            var player1 = new Player(1, "player1", new Question { Answer = "answer" });
+            var player1 = new Player(1, "player1", new Question(1, 1, "some question", "its answer"));
             var player2 = new Player(2, "player2");
             var game = GetGame(player1, player2);
             var gameRepository = new InMemoryGameRepository(game);
@@ -226,7 +226,7 @@ namespace RichDomainModel.Tests
                     new GameCategory {
                         Id = 1,
                         Questions = new List<GameQuestion> {
-                            new GameQuestion { NotUsed = true, Question = new Question { CategoryId = 1, Text = "test question"} } } }}
+                            new GameQuestion { NotUsed = true, Question = new Question(1, 1, "some question", "its answer") } } }}
             );
         }
     }

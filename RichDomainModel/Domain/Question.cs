@@ -2,10 +2,18 @@ namespace RichDomainModel.Domain
 {
     public class Question
     {
-        public int Id { get; set; }
-        public string Text { get; set; }
-        public string Answer { get; set; }
-        public int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public Question(int id, int categoryId, string text, string answer)
+        {
+            Id = id;
+            CategoryId = categoryId;
+            Text = text;
+            Answer = answer;
+        }
+
+        public int Id { get; }
+        public string Text { get; }
+        public string Answer { get; }
+        public int CategoryId { get; }
+        public Category Category { get; }
     }
 }
