@@ -31,9 +31,9 @@ namespace RichDomainModel.Domain
             foreach (var categoryName in categories)
             {
                 var questions = questionRepository.GetRandomForCategory(categoryName, 50)
-                    .Select(q => new GameQuestion { Question = q, NotUsed = true })
+                    .Select(q => new GameQuestion(q, true))
                     .ToList();
-                var category = new GameCategory { Name = categoryName, Questions = questions };
+                var category = new GameCategory(categoryName, questions);
                 game.Categories.Add(category);
             }
             return game;

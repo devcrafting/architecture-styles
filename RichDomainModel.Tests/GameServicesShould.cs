@@ -223,10 +223,8 @@ namespace RichDomainModel.Tests
             return new Game(
                 1, "test", players.ToList(), players.FirstOrDefault(),
                 new List<GameCategory> {
-                    new GameCategory {
-                        Id = 1,
-                        Questions = new List<GameQuestion> {
-                            new GameQuestion { NotUsed = true, Question = new Question(1, 1, "some question", "its answer") } } }}
+                    new GameCategory(1, "some category", new List<GameQuestion> {
+                            new GameQuestion(new Question(1, 1, "some question", "its answer"), true)})}
             );
         }
     }

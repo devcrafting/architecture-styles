@@ -51,7 +51,7 @@ namespace RichDomainModel.Domain
             Place = (Place + diceRoll) % 12;
             var questionToAsk = categories[Place % categories.Count]
                 .Questions.First(x => x.NotUsed);
-            questionToAsk.NotUsed = false;
+            questionToAsk.Use();
             LastQuestion = questionToAsk.Question;
             return questionToAsk;
         }
