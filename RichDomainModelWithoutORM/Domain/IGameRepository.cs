@@ -4,8 +4,8 @@ namespace RichDomainModelWithoutORM.Domain
 {
     public interface IGameRepository
     {
-        void Save(Game game);
+        void Save(string gameId, params object[] events);
         List<Game> GetGames();
-        Game Get(int gameId);
+        Game Get(string gameId);
     }
 }

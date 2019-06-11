@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RichDomainModelWithoutORM.Domain.Events;
 
 namespace RichDomainModelWithoutORM.Domain
 {
     public class Game
     {
-        public int Id { get; }
+        public string Id { get; }
         public string Name { get; }
         public List<Player> Players { get; }
         public Player CurrentPlayer { get; private set; }
         public List<GameCategory> Categories { get; }
 
-        public Game(int id, string name, List<Player> players, Player currentPlayer, List<GameCategory> categories)
+        public Game(string id, string name, List<Player> players, Player currentPlayer, List<GameCategory> categories)
         {
             Id = id;
             Name = name;
@@ -22,33 +23,28 @@ namespace RichDomainModelWithoutORM.Domain
         }
 
         // Factory method
-        internal static Game StartNew(IQuestionRepository questionRepository, string name, IEnumerable<string> categories)
+        internal static GameStarted StartNew(IQuestionRepository questionRepository, string name, IEnumerable<string> categories)
         {
             if (!categories.Any())
                 throw new Exception("You should choose at least one questions' category");
 
-            var game = new Game(0, name, null, null, new List<GameCategory>());
-            foreach (var categoryName in categories)
-            {
-                var questions = questionRepository.GetRandomForCategory(categoryName, 50)
+            var gameCategories = (from categoryName in categories
+                let questions = questionRepository.GetRandomForCategory(categoryName, 50)
                     .Select(q => new GameQuestion(q, true))
-                    .ToList();
-                var category = new GameCategory(categoryName, questions);
-                game.Categories.Add(category);
-            }
-            return game;
+                    .ToList()
+                select new GameCategory(categoryName, questions)).ToList();
+            return new GameStarted(Guid.NewGuid().ToString(), name, gameCategories);
         }
 
-        internal void AddPlayer(string playerName)
+        internal IEnumerable<object> AddPlayer(string playerName)
         {
-            var player = new Player(playerName);
-            if (!this.Players.Any())
-                this.CurrentPlayer = player;
-
-            this.Players.Add(player);
+            var playerId = Guid.NewGuid().ToString();
+            yield return new PlayerAdded(playerId, playerName);
+            if (!Players.Any())
+                yield return new CurrentPlayerInitialized(playerId);
         }
 
-        internal GameQuestion Move(IRollDice dice, int playerId)
+        internal GameQuestion Move(IRollDice dice, string playerId)
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
@@ -67,7 +63,7 @@ namespace RichDomainModelWithoutORM.Domain
             return questionToAsk;
         }
 
-        internal bool Answer(int playerId, string answer)
+        internal bool Answer(string playerId, string answer)
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
@@ -82,7 +78,7 @@ namespace RichDomainModelWithoutORM.Domain
                 throw new Exception($"Game cannot be played with {this.Players.Count} players, at least 2 required");
         }
 
-        private void CheckPlayerTurn(int playerId)
+        private void CheckPlayerTurn(string playerId)
         {
             if (this.CurrentPlayer.Id != playerId)
                 throw new Exception($"It is not {playerId} turn!");

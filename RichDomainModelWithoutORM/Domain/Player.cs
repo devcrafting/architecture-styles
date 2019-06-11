@@ -6,7 +6,7 @@ namespace RichDomainModelWithoutORM.Domain
 {
     public class Player
     {
-        public Player(int id, string playerName) : this(playerName)
+        public Player(string id, string playerName) : this(playerName)
         {
             Id = id;
         }
@@ -19,24 +19,17 @@ namespace RichDomainModelWithoutORM.Domain
             GoldCoins = 0;
         }
 
-        public Player(int id, string playerName, Question lastQuestion) : this(id, playerName)
+        public Player(string id, string playerName, bool isInPenaltyBox, int place, int goldCoins, Question lastQuestion)
         {
-            LastQuestion = lastQuestion;
-        }
-
-        public Player(int id, string playerName, bool isInPenaltyBox) : this(id, playerName)
-        {
+            Id = id;
+            Name = playerName;
             IsInPenaltyBox = isInPenaltyBox;
-        }
-
-        public Player(int id, string playerName, bool isInPenaltyBox, int place, int goldCoins, Question lastQuestion) : this(id, playerName, isInPenaltyBox)
-        {
             Place = place;
             GoldCoins = goldCoins;
             LastQuestion = lastQuestion;
         }
 
-        public int Id { get; }
+        public string Id { get; }
         public string Name { get; }
         public int Place { get; private set; }
         public bool IsInPenaltyBox { get; private set; }

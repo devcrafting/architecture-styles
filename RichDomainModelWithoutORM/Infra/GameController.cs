@@ -14,9 +14,9 @@ namespace RichDomainModelWithoutORM.Infra
         }
 
         [HttpPost]
-        public int NewGame(string name, IEnumerable<string> categories)
+        public string NewGame(string name, IEnumerable<string> categories)
         {
-            return gameServices.StartNewGame(name, categories).Id;
+            return gameServices.StartNewGame(name, categories);
         }
 
         public List<Game> Games()
@@ -25,19 +25,19 @@ namespace RichDomainModelWithoutORM.Infra
         }
 
         [HttpPost]
-        public void AddPlayer(int gameId, string playerName)
+        public void AddPlayer(string gameId, string playerName)
         {
             gameServices.AddPlayer(gameId, playerName);
         }
 
         [HttpPost]
-        public string Move(int gameId, int playerId)
+        public string Move(string gameId, string playerId)
         {
             return gameServices.Move(gameId, playerId).Text;
         }
 
         [HttpPost]
-        public bool Answer(int gameId, int playerId, string answer)
+        public bool Answer(string gameId, string playerId, string answer)
         {
             return gameServices.Answer(gameId, playerId, answer);
         }
