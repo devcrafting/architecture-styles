@@ -8,5 +8,6 @@ namespace AnemicDomainModel.Domain
         public bool IsInPenaltyBox { get; set; }
         public int GoldCoins { get; set; }
         public Question LastQuestion { get; set; }
+        public Game Game { get; set; }
     }
 }

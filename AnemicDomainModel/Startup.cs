@@ -35,6 +35,7 @@ namespace AnemicDomainModel
                 .AddTransient<GameServices>()
                 .AddTransient<IGameRepository, GameRepository>()
                 .AddTransient<IQuestionRepository, QuestionRepository>()
+                .AddTransient<IPlayerRepository, PlayerRepository>()
                 .AddTransient<IRollDice, RandomDice>();
         }
 

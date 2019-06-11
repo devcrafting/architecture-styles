@@ -11,16 +11,19 @@ namespace AnemicDomainModel.Domain
         // - eager loading defined in GetXXX methods (less impact if we do a real agregate repository)
         private readonly IGameRepository gameRepository;
         private readonly IQuestionRepository questionRepository;
+        private readonly IPlayerRepository playerRepository;
         private readonly IRollDice dice;
 
         public GameServices(
             IGameRepository gameRepository,
             IQuestionRepository questionRepository,
-            IRollDice dice)
+            IRollDice dice,
+            IPlayerRepository playerRepository)
         {
             this.gameRepository = gameRepository;
             this.questionRepository = questionRepository;
             this.dice = dice;
+            this.playerRepository = playerRepository;
         }
 
         public Game StartNewGame(string name, IEnumerable<string> categories)
@@ -48,9 +51,6 @@ namespace AnemicDomainModel.Domain
 
         public void AddPlayer(int gameId, string playerName)
         {
-            // NB: we load Game as an agregate root (i.e always with the same eager loading strategy behind Get method)
-            // It is clearly not really common in "Anemic Domain Model"-oriented architecture
-            // More often there are several GetWithXXX methods on the repository
             var game = gameRepository.Get(gameId);
             var player = new Player
                 {
@@ -60,7 +60,7 @@ namespace AnemicDomainModel.Domain
                     GoldCoins = 0
                 };
             if (!game.Players.Any())
-                game.CurrentPlayer = player; 
+                game.CurrentPlayer = player;
 
             game.Players.Add(player);
             // NB: we can just call Save because we know that ORM has tracking
@@ -71,28 +71,27 @@ namespace AnemicDomainModel.Domain
 
         public Question Move(int gameId, int playerId)
         {
-            // We use Game repository, but it is not rare to see Player repository or GameQuestion repository
-            // => accessing directly entities out of the Game agregate
             var game = gameRepository.Get(gameId);
             CheckPlayable(game);
-            CheckPlayerTurn(playerId, game);
-            if (game.CurrentPlayer.LastQuestion != null)
+            var currentPlayer = playerRepository.GetCurrentPlayer(gameId);
+            CheckPlayerTurn(playerId, currentPlayer);
+            if (currentPlayer.LastQuestion != null)
                 throw new Exception("Player already moved, need to answer now");
 
             var diceRoll = dice.Roll();
             GameQuestion questionToAsk = null;
-            if (game.CurrentPlayer.IsInPenaltyBox && diceRoll % 2 == 0)
+            if (currentPlayer.IsInPenaltyBox && diceRoll % 2 == 0)
             {
-                NextPlayerTurn(game);
+                NextPlayerTurn(game, currentPlayer);
             }
             else
             {
-                game.CurrentPlayer.IsInPenaltyBox = false;
-                game.CurrentPlayer.Place = (game.CurrentPlayer.Place + diceRoll) % 12;
-                questionToAsk = game.Categories[game.CurrentPlayer.Place % game.Categories.Count]
+                currentPlayer.IsInPenaltyBox = false;
+                currentPlayer.Place = (currentPlayer.Place + diceRoll) % 12;
+                questionToAsk = game.Categories[currentPlayer.Place % game.Categories.Count]
                     .Questions.First(x => x.NotUsed);
                 questionToAsk.NotUsed = false;
-                game.CurrentPlayer.LastQuestion = questionToAsk.Question;
+                currentPlayer.LastQuestion = questionToAsk.Question;
             }
             gameRepository.Save(game);
             return questionToAsk?.Question;
@@ -102,14 +101,15 @@ namespace AnemicDomainModel.Domain
         {
             var game = gameRepository.Get(gameId);
             CheckPlayable(game);
-            CheckPlayerTurn(playerId, game);
-            var goodAnswer = game.CurrentPlayer.LastQuestion.Answer == answer;
+            var currentPlayer = playerRepository.GetCurrentPlayer(gameId);
+            CheckPlayerTurn(playerId, currentPlayer);
+            var goodAnswer = currentPlayer.LastQuestion.Answer == answer;
             if (goodAnswer)
-                game.CurrentPlayer.GoldCoins++;
+                currentPlayer.GoldCoins++;
             else
-                game.CurrentPlayer.IsInPenaltyBox = true;
-            game.CurrentPlayer.LastQuestion = null;
-            NextPlayerTurn(game);
+                currentPlayer.IsInPenaltyBox = true;
+            currentPlayer.LastQuestion = null;
+            NextPlayerTurn(game, currentPlayer);
             gameRepository.Save(game);
             return goodAnswer;
         }
@@ -120,15 +120,16 @@ namespace AnemicDomainModel.Domain
                 throw new Exception($"Game cannot be played with {game.Players.Count} players, at least 2 required");
         }
 
-        private static void CheckPlayerTurn(int playerId, Game game)
+        private static void CheckPlayerTurn(int playerId, Player currentPlayer)
         {
-            if (game.CurrentPlayer.Id != playerId)
+            if (currentPlayer.Id != playerId)
                 throw new Exception($"It is not {playerId} turn!");
         }
 
-        private static void NextPlayerTurn(Game game)
+        private static void NextPlayerTurn(Game game, Player currentPlayer)
         {
-            game.CurrentPlayer = game.Players[(game.Players.IndexOf(game.CurrentPlayer) + 1) % game.Players.Count];
+            // /!\ typical ORM hack : CurrentPlayer not loaded, but set, knowing that it will be persisted
+            game.CurrentPlayer = game.Players[(game.Players.IndexOf(currentPlayer) + 1) % game.Players.Count];
         }
     }
 }

@@ -18,8 +18,6 @@ namespace AnemicDomainModel.Infra
         {
             return dbContext.Games
                 .Include(x => x.Players)
-                .Include(x => x.CurrentPlayer)
-                    .ThenInclude(x => x.LastQuestion)
                 .Include(x => x.Categories)
                     .ThenInclude(x => x.Questions)
                         .ThenInclude(x => x.Question)

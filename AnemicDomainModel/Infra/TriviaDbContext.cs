@@ -8,13 +8,17 @@ namespace AnemicDomainModel.Infra
     {
         public TriviaDbContext(DbContextOptions<TriviaDbContext> options)
             : base(options)
-        { }
+        {
+            Database.EnsureCreated();
+        }
 
         public DbSet<Game> Games { get; set; }
         public DbSet<Question> Question { get; set; }
+        public DbSet<Player> Players { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Game>().HasMany(game => game.Players).WithOne(player => player.Game);
             var sport = new Category { Id = 1, Name = "Sports" };
             modelBuilder.Entity<Category>().HasData(sport);
 
