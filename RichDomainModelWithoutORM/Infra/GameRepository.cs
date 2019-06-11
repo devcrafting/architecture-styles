@@ -62,6 +62,7 @@ namespace RichDomainModelWithoutORM.Infra
 
         public void Save(Game game)
         {
+            // WE DON'T HAVE TRACKING ANYMORE! HOW CAN WE DO?
         }
     }
 }
