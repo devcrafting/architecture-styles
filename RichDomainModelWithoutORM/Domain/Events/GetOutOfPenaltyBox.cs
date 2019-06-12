@@ -1,6 +1,6 @@
 namespace RichDomainModelWithoutORM.Domain.Events
 {
-    internal struct GetOutOfPenaltyBox
+    public struct GetOutOfPenaltyBox
     {
         public readonly string PlayerId;
 

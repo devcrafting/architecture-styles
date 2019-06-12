@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RichDomainModel\RichDomainModel.csproj" />
+    <ProjectReference Include="..\RichDomainModelWithoutORM\RichDomainModelWithoutORM.csproj" />
   </ItemGroup>
 
 </Project>

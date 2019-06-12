@@ -1,6 +1,6 @@
 namespace RichDomainModelWithoutORM.Domain.Events
 {
-    public class GoneToPenaltyBox
+    public struct GoneToPenaltyBox
     {
         public readonly string PlayerId;
 

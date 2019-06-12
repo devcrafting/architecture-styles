@@ -23,7 +23,7 @@ namespace RichDomainModelWithoutORM.Domain
         }
 
         // Factory method
-        internal static GameStarted StartNew(IQuestionRepository questionRepository, string name, IEnumerable<string> categories)
+        public static GameStarted StartNew(IQuestionRepository questionRepository, string name, IEnumerable<string> categories)
         {
             if (!categories.Any())
                 throw new Exception("You should choose at least one questions' category");
@@ -36,7 +36,7 @@ namespace RichDomainModelWithoutORM.Domain
             return new GameStarted(Guid.NewGuid().ToString(), name, gameCategories);
         }
 
-        internal IEnumerable<object> AddPlayer(string playerName)
+        public IEnumerable<object> AddPlayer(string playerName)
         {
             var playerId = Guid.NewGuid().ToString();
             yield return new PlayerAdded(playerId, playerName);
@@ -44,7 +44,7 @@ namespace RichDomainModelWithoutORM.Domain
                 yield return new CurrentPlayerChanged(playerId);
         }
 
-        internal IEnumerable<object> Move(IRollDice dice, string playerId)
+        public IEnumerable<object> Move(IRollDice dice, string playerId)
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
@@ -64,7 +64,7 @@ namespace RichDomainModelWithoutORM.Domain
             }
         }
 
-        internal IEnumerable<object> Answer(string playerId, string answer)
+        public IEnumerable<object> Answer(string playerId, string answer)
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);

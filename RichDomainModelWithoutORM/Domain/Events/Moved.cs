@@ -1,6 +1,6 @@
 namespace RichDomainModelWithoutORM.Domain.Events
 {
-    internal class Moved
+    public struct Moved
     {
         public readonly string PlayerId;
         public readonly int NewPlace;

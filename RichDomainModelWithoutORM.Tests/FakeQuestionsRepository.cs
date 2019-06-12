@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using RichDomainModel.Domain;
+using RichDomainModelWithoutORM.Domain;
 
 namespace RichDomainModelWithoutORM.Tests
 {

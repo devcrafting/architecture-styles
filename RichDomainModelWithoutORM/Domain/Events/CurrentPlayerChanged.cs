@@ -1,6 +1,6 @@
 namespace RichDomainModelWithoutORM.Domain.Events
 {
-    internal class CurrentPlayerChanged
+    public struct CurrentPlayerChanged
     {
         public readonly string PlayerId;
 

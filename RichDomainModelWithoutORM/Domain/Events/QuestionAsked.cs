@@ -1,6 +1,6 @@
 namespace RichDomainModelWithoutORM.Domain.Events
 {
-    public class QuestionAsked
+    public struct QuestionAsked
     {
         public readonly int QuestionId;
         public readonly string Text;

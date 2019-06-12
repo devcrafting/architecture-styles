@@ -1,4 +1,4 @@
-using RichDomainModel.Domain;
+using RichDomainModelWithoutORM.Domain;
 
 namespace RichDomainModelWithoutORM.Tests
 {

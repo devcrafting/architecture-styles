@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using RichDomainModel.Domain;
+using RichDomainModelWithoutORM.Domain;
 
 namespace RichDomainModelWithoutORM.Tests
 {
@@ -15,7 +15,7 @@ namespace RichDomainModelWithoutORM.Tests
             _games.AddRange(games);
         }
 
-        public Game Get(int gameId) =>
+        public Game Get(string gameId) =>
             _games.Single(x => x.Id == gameId);
 
         public List<Game> GetGames()
@@ -23,9 +23,8 @@ namespace RichDomainModelWithoutORM.Tests
             throw new System.NotImplementedException();
         }
 
-        public void Save(Game game)
+        public void Save(string gameId, params object[] events)
         {
-            LastGameSaved = game;
         }
     }
 }
