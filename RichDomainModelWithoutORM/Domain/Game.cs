@@ -10,7 +10,7 @@ namespace RichDomainModelWithoutORM.Domain
         public string Id { get; }
         public string Name { get; }
         public List<Player> Players { get; }
-        public Player CurrentPlayer { get; private set; }
+        public Player CurrentPlayer { get; }
         public List<GameCategory> Categories { get; }
 
         public Game(string id, string name, List<Player> players, Player currentPlayer, List<GameCategory> categories)
@@ -41,52 +41,50 @@ namespace RichDomainModelWithoutORM.Domain
             var playerId = Guid.NewGuid().ToString();
             yield return new PlayerAdded(playerId, playerName);
             if (!Players.Any())
-                yield return new CurrentPlayerInitialized(playerId);
+                yield return new CurrentPlayerChanged(playerId);
         }
 
-        internal GameQuestion Move(IRollDice dice, string playerId)
+        internal IEnumerable<object> Move(IRollDice dice, string playerId)
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
             CurrentPlayer.CheckCanMove();
 
             var diceRoll = dice.Roll();
-            GameQuestion questionToAsk = null;
             if (CurrentPlayer.CannotGoOutOfPenaltyBox(diceRoll))
             {
-                NextPlayerTurn();
+                yield return NextPlayerTurn();
             }
             else
             {
-                questionToAsk = CurrentPlayer.Move(diceRoll, Categories);
+                foreach (var @event in CurrentPlayer.Move(diceRoll, Categories))
+                {
+                    yield return @event;
+                }
             }
-            return questionToAsk;
         }
 
-        internal bool Answer(string playerId, string answer)
+        internal IEnumerable<object> Answer(string playerId, string answer)
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
-            var goodAnswer = CurrentPlayer.Answer(answer);
-            NextPlayerTurn();
-            return goodAnswer;
+            yield return CurrentPlayer.Answer(answer);
+            yield return NextPlayerTurn();
         }
 
         private void CheckPlayable()
         {
-            if (this.Players.Count < 2)
-                throw new Exception($"Game cannot be played with {this.Players.Count} players, at least 2 required");
+            if (Players.Count < 2)
+                throw new Exception($"Game cannot be played with {Players.Count} players, at least 2 required");
         }
 
         private void CheckPlayerTurn(string playerId)
         {
-            if (this.CurrentPlayer.Id != playerId)
+            if (CurrentPlayer.Id != playerId)
                 throw new Exception($"It is not {playerId} turn!");
         }
 
-        private void NextPlayerTurn()
-        {
-            this.CurrentPlayer = this.Players[(this.Players.IndexOf(this.CurrentPlayer) + 1) % this.Players.Count];
-        }
+        private CurrentPlayerChanged NextPlayerTurn() =>
+            new CurrentPlayerChanged(Players[(Players.FindIndex(p => p.Id == CurrentPlayer.Id) + 1) % this.Players.Count].Id);
     }
 }

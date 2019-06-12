@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RichDomainModelWithoutORM.Domain.Events;
 
 namespace RichDomainModelWithoutORM.Domain
 {
@@ -31,7 +32,7 @@ namespace RichDomainModelWithoutORM.Domain
 
         public string Id { get; }
         public string Name { get; }
-        public int Place { get; private set; }
+        public int Place { get; }
         public bool IsInPenaltyBox { get; private set; }
         public int GoldCoins { get; private set; }
         public Question LastQuestion { get; private set; }
@@ -45,26 +46,23 @@ namespace RichDomainModelWithoutORM.Domain
         internal bool CannotGoOutOfPenaltyBox(int diceRoll) =>
             IsInPenaltyBox && diceRoll % 2 == 0;
 
-        internal GameQuestion Move(int diceRoll, List<GameCategory> categories)
+        internal IEnumerable<object> Move(int diceRoll, List<GameCategory> categories)
         {
-            IsInPenaltyBox = false;
-            Place = (Place + diceRoll) % 12;
-            var questionToAsk = categories[Place % categories.Count]
-                .Questions.First(x => x.NotUsed);
-            questionToAsk.Use();
-            LastQuestion = questionToAsk.Question;
-            return questionToAsk;
+            if (IsInPenaltyBox)
+                yield return new GetOutOfPenaltyBox(Id);
+            var newPlace = (Place + diceRoll) % 12;
+            yield return new Moved(Id, newPlace);
+            var questionToAsk = categories[newPlace % categories.Count]
+                .Questions.First(x => x.NotUsed).Question;
+            yield return new QuestionAsked(questionToAsk.Id, questionToAsk.Text);
         }
 
-        internal bool Answer(string answer)
+        internal object Answer(string answer)
         {
-            var goodAnswer = LastQuestion.Answer == answer;
-            if (goodAnswer)
-                GoldCoins++;
+            if (LastQuestion.Answer == answer)
+                return new GoldCoinEarned(Id, GoldCoins + 1);
             else
-                IsInPenaltyBox = true;
-            LastQuestion = null;
-            return goodAnswer;
+                return new GoneToPenaltyBox(Id);
         }
     }
 }

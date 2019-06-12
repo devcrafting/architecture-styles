@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using RichDomainModelWithoutORM.Domain.Events;
 
 namespace RichDomainModelWithoutORM.Domain
 {
@@ -38,20 +39,21 @@ namespace RichDomainModelWithoutORM.Domain
             gameRepository.Save(gameId, events.ToArray());
         }
 
-        public Question Move(string gameId, string playerId)
+        public QuestionAsked Move(string gameId, string playerId)
         {
             var game = gameRepository.Get(gameId);
-            var questionToAsk = game.Move(dice, playerId);
-            gameRepository.Save(gameId);
-            return questionToAsk?.Question;
+            var events = game.Move(dice, playerId).ToArray();
+            gameRepository.Save(gameId, events);
+            return events.OfType<QuestionAsked>().FirstOrDefault();
         }
 
         public bool Answer(string gameId, string playerId, string answer)
         {
             var game = gameRepository.Get(gameId);
-            var goodAnswer = game.Answer(playerId, answer);
-            gameRepository.Save(gameId);
-            return goodAnswer;
+            var events = game.Answer(playerId, answer).ToArray();
+            gameRepository.Save(gameId, events);
+            // Could give better information to client than just a bool => can return events including if game won
+            return events.OfType<GoldCoinEarned>().Any();
         }
     }
 }

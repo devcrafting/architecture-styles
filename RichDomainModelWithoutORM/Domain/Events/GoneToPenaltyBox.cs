@@ -1,10 +1,10 @@
 namespace RichDomainModelWithoutORM.Domain.Events
 {
-    public class CurrentPlayerInitialized
+    public class GoneToPenaltyBox
     {
         public readonly string PlayerId;
 
-        public CurrentPlayerInitialized(string playerId)
+        public GoneToPenaltyBox(string playerId)
         {
             PlayerId = playerId;
         }
