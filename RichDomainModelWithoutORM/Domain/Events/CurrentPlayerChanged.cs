@@ -1,6 +1,6 @@
 namespace RichDomainModelWithoutORM.Domain.Events
 {
-    public struct CurrentPlayerChanged
+    public struct CurrentPlayerChanged : IDomainEvent
     {
         public readonly string PlayerId;
 

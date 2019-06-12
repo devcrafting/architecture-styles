@@ -36,7 +36,7 @@ namespace RichDomainModelWithoutORM.Domain
             return new GameStarted(Guid.NewGuid().ToString(), name, gameCategories);
         }
 
-        public IEnumerable<object> AddPlayer(string playerName)
+        public IEnumerable<IDomainEvent> AddPlayer(string playerName)
         {
             var playerId = Guid.NewGuid().ToString();
             yield return new PlayerAdded(playerId, playerName);
@@ -44,7 +44,7 @@ namespace RichDomainModelWithoutORM.Domain
                 yield return new CurrentPlayerChanged(playerId);
         }
 
-        public IEnumerable<object> Move(IRollDice dice, string playerId)
+        public IEnumerable<IDomainEvent> Move(IRollDice dice, string playerId)
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
@@ -57,14 +57,12 @@ namespace RichDomainModelWithoutORM.Domain
             }
             else
             {
-                foreach (var @event in CurrentPlayer.Move(diceRoll, Categories))
-                {
+                foreach (var @event in CurrentPlayer.Move(diceRoll, Categories)) // Meh!! Missing yield! return from F# :/
                     yield return @event;
-                }
             }
         }
 
-        public IEnumerable<object> Answer(string playerId, string answer)
+        public IEnumerable<IDomainEvent> Answer(string playerId, string answer)
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);

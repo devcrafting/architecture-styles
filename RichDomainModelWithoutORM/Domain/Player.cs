@@ -46,7 +46,7 @@ namespace RichDomainModelWithoutORM.Domain
         internal bool CannotGoOutOfPenaltyBox(int diceRoll) =>
             IsInPenaltyBox && diceRoll % 2 == 0;
 
-        internal IEnumerable<object> Move(int diceRoll, List<GameCategory> categories)
+        internal IEnumerable<IDomainEvent> Move(int diceRoll, List<GameCategory> categories)
         {
             if (IsInPenaltyBox)
                 yield return new GetOutOfPenaltyBox(Id);
@@ -57,7 +57,7 @@ namespace RichDomainModelWithoutORM.Domain
             yield return new QuestionAsked(questionToAsk.Id, questionToAsk.Text);
         }
 
-        internal object Answer(string answer)
+        internal IDomainEvent Answer(string answer)
         {
             if (LastQuestion.Answer == answer)
                 return new GoldCoinEarned(Id, GoldCoins + 1);

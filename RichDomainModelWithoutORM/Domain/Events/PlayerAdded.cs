@@ -1,6 +1,6 @@
 namespace RichDomainModelWithoutORM.Domain.Events
 {
-    public struct PlayerAdded
+    public struct PlayerAdded : IDomainEvent
     {
         public readonly string PlayerId;
         public readonly string PlayerName;

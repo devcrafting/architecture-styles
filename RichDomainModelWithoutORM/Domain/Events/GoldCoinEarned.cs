@@ -1,6 +1,6 @@
 namespace RichDomainModelWithoutORM.Domain.Events
 {
-    public struct GoldCoinEarned
+    public struct GoldCoinEarned : IDomainEvent
     {
         public readonly string PlayerId;
         public readonly int GoldCoins;
