@@ -26,14 +26,14 @@ namespace RichDomainModelWithoutORM.Infra
                         var players = GetPlayers(connection, gameId);
                         var currentPlayer = players.Single(p => p.Id == (string) g.CurrentPlayerId);
                         return new Game((string) g.Id, (string) g.Name, players,
-                            currentPlayer, GetCategories(connection, gameId));
+                            currentPlayer, GetQuestionsDeck(connection, gameId));
                     })
                     .Single();
             }
         }
 
-        private List<GameCategory> GetCategories(IDbConnection connection, string gameId) =>
-            connection.Query(
+        private QuestionsDeck GetQuestionsDeck(IDbConnection connection, string gameId) =>
+            new QuestionsDeck(connection.Query(
                     "SELECT gc.Id, Name, gq.NotUsed, gq.QuestionId, q.Text as QuestionText, q.Answer as QuestionAnswer " +
                     "FROM GameCategory gc " +
                     "INNER JOIN GameQuestion gq ON gc.Id = gq.GameCategoryId " +
@@ -47,7 +47,7 @@ namespace RichDomainModelWithoutORM.Infra
                                     new Question((int) q.QuestionId, (string) q.QuestionText,
                                         (string) q.QuestionAnswer), q.NotUsed > 0))
                             .ToList()))
-                .ToList();
+                .ToList());
 
         private List<Player> GetPlayers(IDbConnection connection, string gameId) =>
             connection.Query(

@@ -7,19 +7,21 @@ namespace RichDomainModelWithoutORM.Domain
 {
     public class Game
     {
+        private readonly List<Player> _players = new List<Player>();
+
         public string Id { get; }
         public string Name { get; }
-        public List<Player> Players { get; }
+        public IEnumerable<Player> Players => _players;
         public Player CurrentPlayer { get; }
-        public List<GameCategory> Categories { get; }
+        public QuestionsDeck QuestionDeck { get; }
 
-        public Game(string id, string name, List<Player> players, Player currentPlayer, List<GameCategory> categories)
+        public Game(string id, string name, IEnumerable<Player> players, Player currentPlayer, QuestionsDeck questionDeck)
         {
             Id = id;
             Name = name;
-            Players = players;
+            _players.AddRange(players);
             CurrentPlayer = currentPlayer;
-            Categories = categories;
+            QuestionDeck = questionDeck;
         }
 
         // Factory method
@@ -40,7 +42,7 @@ namespace RichDomainModelWithoutORM.Domain
         {
             var playerId = Guid.NewGuid().ToString();
             yield return new PlayerAdded(playerId, playerName);
-            if (!Players.Any())
+            if (!_players.Any())
                 yield return new CurrentPlayerChanged(playerId);
         }
 
@@ -57,7 +59,7 @@ namespace RichDomainModelWithoutORM.Domain
             }
             else
             {
-                foreach (var @event in CurrentPlayer.Move(diceRoll, Categories)) // Meh!! Missing yield! return from F# :/
+                foreach (var @event in CurrentPlayer.Move(diceRoll, QuestionDeck)) // Meh!! Missing yield! return from F# :/
                     yield return @event;
             }
         }
@@ -72,8 +74,8 @@ namespace RichDomainModelWithoutORM.Domain
 
         private void CheckPlayable()
         {
-            if (Players.Count < 2)
-                throw new Exception($"Game cannot be played with {Players.Count} players, at least 2 required");
+            if (_players.Count < 2)
+                throw new Exception($"Game cannot be played with {_players.Count} players, at least 2 required");
         }
 
         private void CheckPlayerTurn(string playerId)
@@ -83,6 +85,6 @@ namespace RichDomainModelWithoutORM.Domain
         }
 
         private CurrentPlayerChanged NextPlayerTurn() =>
-            new CurrentPlayerChanged(Players[(Players.FindIndex(p => p.Id == CurrentPlayer.Id) + 1) % this.Players.Count].Id);
+            new CurrentPlayerChanged(_players[(_players.FindIndex(p => p.Id == CurrentPlayer.Id) + 1) % this._players.Count].Id);
     }
 }

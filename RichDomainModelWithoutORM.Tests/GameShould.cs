@@ -66,7 +66,7 @@ namespace RichDomainModelWithoutORM.Tests
 
             var events = game.Move(fakeDice, player1.Id);
 
-            var question = game.Categories.First().Questions.First().Question;
+            var question = game.QuestionDeck.Categories.First().Questions.First().Question;
             Check.That(events).ContainsExactly(new Moved(player1.Id, 2), new QuestionAsked(question.Id, question.Text));
         }
 
@@ -124,7 +124,7 @@ namespace RichDomainModelWithoutORM.Tests
 
             var events = game.Move(fakeDice, player1.Id);
 
-            var question = game.Categories.First().Questions.First().Question;
+            var question = game.QuestionDeck.Categories.First().Questions.First().Question;
             Check.That(events).ContainsExactly(
                 new GetOutOfPenaltyBox(player1.Id), new Moved(player1.Id, 3), new QuestionAsked(question.Id, question.Text));
         }
@@ -178,9 +178,9 @@ namespace RichDomainModelWithoutORM.Tests
         {
             return new Game(
                 "some id", "test", players.ToList(), players.FirstOrDefault(),
-                new List<GameCategory> {
+               new QuestionsDeck(new List<GameCategory> {
                     new GameCategory(1, "some category", new List<GameQuestion> {
-                            new GameQuestion(new Question(1, "some question", "its answer"), true)})}
+                            new GameQuestion(new Question(1, "some question", "its answer"), true)})})
             );
         }
     }
