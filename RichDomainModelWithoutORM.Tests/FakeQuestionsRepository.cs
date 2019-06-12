@@ -9,7 +9,7 @@ namespace RichDomainModelWithoutORM.Tests
         public IEnumerable<Question> GetRandomForCategory(string categoryName, int nbQuestions)
         {
             return Enumerable.Range(1, 50)
-                .Select(x => new Question(x, 1, "some question", "its answer")).ToList();
+                .Select(x => new Question(x, "some question", "its answer")).ToList();
         }
     }
 }

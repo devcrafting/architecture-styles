@@ -16,7 +16,7 @@ namespace RichDomainModelWithoutORM.Infra
                                         "INNER JOIN Category c ON q.CategoryId = c.Id " +
                                         "WHERE c.Name = @categoryName " +
                                         "LIMIT @nbQuestions", new {categoryName, nbQuestions})
-                    .Select(q => new Question((int)q.Id, 0, (string)q.Text, (string)q.Answer))
+                    .Select(q => new Question((int)q.Id, (string)q.Text, (string)q.Answer))
                     .ToList();
             }
         }

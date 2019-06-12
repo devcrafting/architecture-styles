@@ -94,7 +94,7 @@ namespace RichDomainModelWithoutORM.Tests
         [Fact]
         public void FailToMovePlayerWhenLastQuestionNotAnswered()
         {
-            var player1 = new Player("1", "player1", false, 0, 0, new Question(1, 1, "some question", "its answer"));
+            var player1 = new Player("1", "player1", false, 0, 0, new Question(1, "some question", "its answer"));
             var player2 = new Player("2", "player2");
             var game = GetGame(player1, player2);
             
@@ -132,7 +132,7 @@ namespace RichDomainModelWithoutORM.Tests
         [Fact]
         public void AnswerCorrectly()
         {
-            var player1 = new Player("1", "player1", false, 0, 0, new Question(1, 1, "some question", "its answer"));
+            var player1 = new Player("1", "player1", false, 0, 0, new Question(1, "some question", "its answer"));
             var player2 = new Player("2", "player2");
             var game = GetGame(player1, player2);
 
@@ -144,7 +144,7 @@ namespace RichDomainModelWithoutORM.Tests
         [Fact]
         public void AnswerIncorrectly()
         {
-            var player1 = new Player("1", "player1", false, 0, 0, new Question(1, 1, "some question", "its answer"));
+            var player1 = new Player("1", "player1", false, 0, 0, new Question(1, "some question", "its answer"));
             var player2 = new Player("2", "player2");
             var game = GetGame(player1, player2);
 
@@ -180,7 +180,7 @@ namespace RichDomainModelWithoutORM.Tests
                 "some id", "test", players.ToList(), players.FirstOrDefault(),
                 new List<GameCategory> {
                     new GameCategory(1, "some category", new List<GameQuestion> {
-                            new GameQuestion(new Question(1, 1, "some question", "its answer"), true)})}
+                            new GameQuestion(new Question(1, "some question", "its answer"), true)})}
             );
         }
     }

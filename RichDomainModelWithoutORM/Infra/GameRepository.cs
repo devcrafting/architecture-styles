@@ -44,7 +44,7 @@ namespace RichDomainModelWithoutORM.Infra
                     new GameCategory(x.Key.Item1, x.Key.Item2,
                         x.Select(q =>
                                 new GameQuestion(
-                                    new Question((int) q.QuestionId, 0, (string) q.QuestionText,
+                                    new Question((int) q.QuestionId, (string) q.QuestionText,
                                         (string) q.QuestionAnswer), q.NotUsed > 0))
                             .ToList()))
                 .ToList();
@@ -60,7 +60,7 @@ namespace RichDomainModelWithoutORM.Infra
                     new Player((string) p.Id, (string) p.Name, p.IsInPenaltyBox > 0, (int) p.Place, (int) p.GoldCoins,
                         p.LastQuestionId == null
                             ? null
-                            : new Question((int) p.LastQuestionId, 0, (string) p.LastQuestionText,
+                            : new Question((int) p.LastQuestionId, (string) p.LastQuestionText,
                                 (string) p.LastQuestionAnswer)))
                 .ToList();
 
