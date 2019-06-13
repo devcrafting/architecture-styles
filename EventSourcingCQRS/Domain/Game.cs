@@ -39,7 +39,12 @@ namespace EventSourcingCQRS.Domain
         {
             ((dynamic)_currentPlayer).Apply((dynamic)questionAsked);
         }
-        
+
+        public void Apply(GoneToPenaltyBox goneToPenaltyBox)
+        {
+            ((dynamic)_currentPlayer).Apply((dynamic)goneToPenaltyBox);
+        }
+
         public Game(IEnumerable<IDomainEvent> history)
         {
             foreach (var @event in history) Apply((dynamic) @event);

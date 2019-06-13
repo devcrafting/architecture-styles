@@ -38,6 +38,12 @@ namespace EventSourcingCQRS.Domain
             _expectedAnswer = questionAsked.Answer;
         }
 
+        public void Apply(GoneToPenaltyBox goneToPenaltyBox)
+        {
+            _isInPenaltyBox = true;
+            _expectedAnswer = null;
+        }
+
         internal void CheckCanMove()
         {
             if (!string.IsNullOrEmpty(this._expectedAnswer))
