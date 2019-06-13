@@ -13,8 +13,6 @@ namespace EventSourcingCQRS.Domain
             _categories.AddRange(categories);
         }
 
-        public IEnumerable<GameCategory> Categories => _categories;
-
         public IDomainEvent Draw(int newPlace)
         {
             var questionToAsk = _categories[newPlace % _categories.Count]

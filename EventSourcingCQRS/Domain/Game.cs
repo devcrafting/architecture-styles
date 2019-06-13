@@ -12,8 +12,8 @@ namespace EventSourcingCQRS.Domain
         {
             public string Id { get; private set; }
             // Note we don't need Name anymore to take decision : public string Name { get; }
-            public List<Player> Players = new List<Player>();
-            public Player CurrentPlayer { get; }
+            public readonly List<Player> Players = new List<Player>();
+            public Player CurrentPlayer { get; private set; }
             public QuestionsDeck QuestionsDeck { get; private set; }
             
             public void Apply(GameStarted gameStarted)

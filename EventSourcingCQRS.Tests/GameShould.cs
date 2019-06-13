@@ -34,7 +34,7 @@ namespace EventSourcingCQRS.Tests
         [Fact]
         public void AddFirstPlayer()
         {
-            var game = GetGame(new GameStarted("gameId", "name", new List<GameCategory>()));
+            var game = GetGame(new GameStarted("gameId", "name", GameCategories));
 
             var events = game.AddPlayer("player1").ToArray();
 
@@ -47,7 +47,7 @@ namespace EventSourcingCQRS.Tests
         public void AddAnotherPlayerWithoutChangingCurrentPlayer()
         {
             var game = GetGame(
-                new GameStarted("gameId", "name", new List<GameCategory>()),
+                new GameStarted("gameId", "name", GameCategories),
                 new PlayerAdded("p1Id", "player1"));
 
             var events = game.AddPlayer("player2").ToArray();
@@ -176,5 +176,13 @@ namespace EventSourcingCQRS.Tests
         //}
 
         private static Game GetGame(params IDomainEvent[] pastEvents) => new Game(pastEvents);
+
+        private List<GameCategory> GameCategories => new List<GameCategory>()
+        {
+            new GameCategory("sports", new List<GameQuestion>()
+            {
+                new GameQuestion(new Question(1, "question", "answer"), true)
+            })
+        };
     }
 }
