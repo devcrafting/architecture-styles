@@ -61,8 +61,7 @@ namespace EventSourcingCQRS.Infra
                     new Player((string) p.Id, (string) p.Name, p.IsInPenaltyBox > 0, (int) p.Place, (int) p.GoldCoins,
                         p.LastQuestionId == null
                             ? null
-                            : new Question((int) p.LastQuestionId, (string) p.LastQuestionText,
-                                (string) p.LastQuestionAnswer)))
+                            : (string) p.LastQuestionAnswer))
                 .ToList();
 
         public List<Game> GetGames()

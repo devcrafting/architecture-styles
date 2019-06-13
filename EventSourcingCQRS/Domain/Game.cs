@@ -8,32 +8,41 @@ namespace EventSourcingCQRS.Domain
 {
     public class Game
     {
-        private class State
+        private string _id;
+        // Note we don't need Name anymore to take decision : public string Name { get; }
+        private readonly List<Player> _players = new List<Player>();
+        private Player _currentPlayer;
+        private QuestionsDeck _questionsDeck;
+        
+        public void Apply(GameStarted gameStarted)
         {
-            public string Id { get; private set; }
-            // Note we don't need Name anymore to take decision : public string Name { get; }
-            public readonly List<Player> Players = new List<Player>();
-            public Player CurrentPlayer { get; private set; }
-            public QuestionsDeck QuestionsDeck { get; private set; }
-            
-            public void Apply(GameStarted gameStarted)
-            {
-                Id = gameStarted.GameId;
-                QuestionsDeck = new QuestionsDeck(gameStarted.GameCategories);
-            }
-
-            public void Apply(PlayerAdded playerAdded)
-            {
-                Players.Add(new Player(playerAdded.PlayerId, playerAdded.PlayerName));
-            }
+            _id = gameStarted.GameId;
+            _questionsDeck = new QuestionsDeck(gameStarted.GameCategories);
         }
 
-        private readonly State _state = new State();
+        public void Apply(PlayerAdded playerAdded)
+        {
+            _players.Add(new Player(playerAdded.PlayerId, playerAdded.PlayerName));
+        }
+
+        public void Apply(CurrentPlayerChanged currentPlayerChanged)
+        {
+            _currentPlayer = _players.First(x => x.Id == currentPlayerChanged.PlayerId);
+        }
+
+        public void Apply(Moved moved)
+        {
+            ((dynamic)_currentPlayer).Apply((dynamic)moved);
+        }
+
+        public void Apply(QuestionAsked questionAsked)
+        {
+            ((dynamic)_currentPlayer).Apply((dynamic)questionAsked);
+        }
         
         public Game(IEnumerable<IDomainEvent> history)
         {
-            var state = (dynamic) _state;
-            foreach (var @event in history) state.Apply((dynamic) @event);
+            foreach (var @event in history) Apply((dynamic) @event);
         }
 
         // Factory method
@@ -54,7 +63,7 @@ namespace EventSourcingCQRS.Domain
         {
             var playerId = Guid.NewGuid().ToString();
             yield return new PlayerAdded(playerId, playerName);
-            if (!_state.Players.Any())
+            if (!_players.Any())
                 yield return new CurrentPlayerChanged(playerId);
         }
 
@@ -62,16 +71,16 @@ namespace EventSourcingCQRS.Domain
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
-            _state.CurrentPlayer.CheckCanMove();
+            _currentPlayer.CheckCanMove();
 
             var diceRoll = dice.Roll();
-            if (_state.CurrentPlayer.CannotGoOutOfPenaltyBox(diceRoll))
+            if (_currentPlayer.CannotGoOutOfPenaltyBox(diceRoll))
             {
                 yield return NextPlayerTurn();
             }
             else
             {
-                foreach (var @event in _state.CurrentPlayer.Move(diceRoll, _state.QuestionsDeck)) // Meh!! Missing yield! return from F# :/
+                foreach (var @event in _currentPlayer.Move(diceRoll, _questionsDeck)) // Meh!! Missing yield! return from F# :/
                     yield return @event;
             }
         }
@@ -80,23 +89,23 @@ namespace EventSourcingCQRS.Domain
         {
             CheckPlayable();
             CheckPlayerTurn(playerId);
-            yield return _state.CurrentPlayer.Answer(answer);
+            yield return _currentPlayer.Answer(answer);
             yield return NextPlayerTurn();
         }
 
         private void CheckPlayable()
         {
-            if (_state.Players.Count < 2)
-                throw new Exception($"Game cannot be played with {_state.Players.Count} players, at least 2 required");
+            if (_players.Count < 2)
+                throw new Exception($"Game cannot be played with {_players.Count} players, at least 2 required");
         }
 
         private void CheckPlayerTurn(string playerId)
         {
-            if (_state.CurrentPlayer.Id != playerId)
+            if (_currentPlayer.Id != playerId)
                 throw new Exception($"It is not {playerId} turn!");
         }
 
         private CurrentPlayerChanged NextPlayerTurn() =>
-            new CurrentPlayerChanged(_state.Players[(_state.Players.FindIndex(p => p.Id == _state.CurrentPlayer.Id) + 1) % _state.Players.Count].Id);
+            new CurrentPlayerChanged(_players[(_players.FindIndex(p => p.Id == _currentPlayer.Id) + 1) % _players.Count].Id);
     }
 }

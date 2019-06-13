@@ -57,51 +57,67 @@ namespace EventSourcingCQRS.Tests
             Check.That(events).ContainsExactly(new PlayerAdded(playerId, "player2"));
         }
 
-        //[Fact]
-        //public void MoveCurrentPlayer()
-        //{
-        //    var player1 = new Player("player1");
-        //    var player2 = new Player("player2");
-        //    var game = GetGame(player1, player2);
-        //    var fakeDice = new FakeDice(2);
+        [Fact]
+        public void MoveCurrentPlayer()
+        {
+            const string playerId = "p1Id";
+            var game = GetGame(
+                new GameStarted("gameId", "name", GameCategories),
+                new PlayerAdded(playerId, "player1"),
+                new CurrentPlayerChanged(playerId),
+                new PlayerAdded("p2Id", "player2"));
+            var fakeDice = new FakeDice(2);
 
-        //    var events = game.Move(fakeDice, player1.Id);
+            var events = game.Move(fakeDice, playerId);
 
-        //    var question = game.QuestionDeck.Categories.First().Questions.First().Question;
-        //    Check.That(events).ContainsExactly(new Moved(player1.Id, 2), new QuestionAsked(question.Id, question.Text));
-        //}
+            var question = GameCategories.First().Questions.First().Question;
+            Check.That(events).ContainsExactly(
+                new Moved(playerId, 2),
+                new QuestionAsked(question.Id, question.Text, question.Answer));
+        }
 
-        //[Fact]
-        //public void FailToMoveCurrentPlayerWhenLessThan2Players()
-        //{
-        //    var player1 = new Player("player1");
-        //    var game = GetGame(player1);
+        [Fact]
+        public void FailToMoveCurrentPlayerWhenLessThan2Players()
+        {
+            const string playerId = "p1Id";
+            var game = GetGame(
+                new GameStarted("gameId", "name", GameCategories),
+                new PlayerAdded(playerId, "player1"));
 
-        //    Check.ThatCode(() => game.Move(null, player1.Id).ToArray())
-        //        .Throws<Exception>().WithMessage("Game cannot be played with 1 players, at least 2 required");
-        //}
+            Check.ThatCode(() => game.Move(null, playerId).ToArray())
+                .Throws<Exception>().WithMessage("Game cannot be played with 1 players, at least 2 required");
+        }
 
-        //[Fact]
-        //public void FailToMovePlayerWhenNotTheCurrentPlayer()
-        //{
-        //    var player1 = new Player("1", "player1");
-        //    var player2 = new Player("2", "player2");
-        //    var game = GetGame(player1, player2);
+        [Fact]
+        public void FailToMovePlayerWhenNotTheCurrentPlayer()
+        {
+            const string player1Id = "1";
+            const string player2Id = "2";
+            var game = GetGame(
+                new GameStarted("gameId", "name", GameCategories),
+                new PlayerAdded(player1Id, "player1"),
+                new CurrentPlayerChanged(player1Id),
+                new PlayerAdded(player2Id, "player2"));
 
-        //    Check.ThatCode(() => game.Move(null, player2.Id).ToArray())
-        //        .Throws<Exception>().WithMessage("It is not 2 turn!");
-        //}
+            Check.ThatCode(() => game.Move(null, player2Id).ToArray())
+                .Throws<Exception>().WithMessage("It is not 2 turn!");
+        }
 
-        //[Fact]
-        //public void FailToMovePlayerWhenLastQuestionNotAnswered()
-        //{
-        //    var player1 = new Player("1", "player1", false, 0, 0, new Question(1, "some question", "its answer"));
-        //    var player2 = new Player("2", "player2");
-        //    var game = GetGame(player1, player2);
+        [Fact]
+        public void FailToMovePlayerWhenLastQuestionNotAnswered()
+        {
+            const string playerId = "p1Id";
+            var game = GetGame(
+                new GameStarted("gameId", "name", GameCategories),
+                new PlayerAdded(playerId, "player1"),
+                new CurrentPlayerChanged(playerId),
+                new PlayerAdded("p2Id", "player2"),
+                new Moved(playerId, 2),
+                new QuestionAsked(1, "question", "answer"));
 
-        //    Check.ThatCode(() => game.Move(null, player1.Id).ToArray())
-        //        .Throws<Exception>().WithMessage("Player already moved, need to answer now");
-        //}
+            Check.ThatCode(() => game.Move(null, playerId).ToArray())
+                .Throws<Exception>().WithMessage("Player already moved, need to answer now");
+        }
 
         //[Fact]
         //public void DoNotMoveCurrentPlayerIfInPenaltyBoxAndRollEvenDice()

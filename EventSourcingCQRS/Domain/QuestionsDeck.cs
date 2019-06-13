@@ -8,6 +8,8 @@ namespace EventSourcingCQRS.Domain
     {
         private readonly List<GameCategory> _categories = new List<GameCategory>();
 
+        public IEnumerable<GameCategory> Categories => _categories;
+
         public QuestionsDeck(IEnumerable<GameCategory> categories)
         {
             _categories.AddRange(categories);
@@ -17,7 +19,7 @@ namespace EventSourcingCQRS.Domain
         {
             var questionToAsk = _categories[newPlace % _categories.Count]
                 .Questions.First(x => x.NotUsed).Question;
-            return new QuestionAsked(questionToAsk.Id, questionToAsk.Text);
+            return new QuestionAsked(questionToAsk.Id, questionToAsk.Text, questionToAsk.Answer);
         }
     }
 }

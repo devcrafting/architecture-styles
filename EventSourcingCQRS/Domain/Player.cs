@@ -6,60 +6,61 @@ namespace EventSourcingCQRS.Domain
 {
     public class Player
     {
-        public Player(string id, string playerName) : this(playerName)
+        public Player(string id, string playerName) : this(id, playerName, false, 0, 0, null)
         {
             Id = id;
         }
 
-        public Player(string playerName)
-        {
-            Name = playerName;
-            Place = 0;
-            IsInPenaltyBox = false;
-            GoldCoins = 0;
-        }
-
-        public Player(string id, string playerName, bool isInPenaltyBox, int place, int goldCoins, Question lastQuestion)
+        public Player(string id, string playerName, bool isInPenaltyBox, int place, int goldCoins, string expectedAnswer)
         {
             Id = id;
-            Name = playerName;
-            IsInPenaltyBox = isInPenaltyBox;
-            Place = place;
-            GoldCoins = goldCoins;
-            LastQuestion = lastQuestion;
+            _isInPenaltyBox = isInPenaltyBox;
+            _place = place;
+            _goldCoins = goldCoins;
+            _expectedAnswer = expectedAnswer;
         }
 
-        public string Id { get; }
-        public string Name { get; }
-        public int Place { get; }
-        public bool IsInPenaltyBox { get; private set; }
-        public int GoldCoins { get; private set; }
-        public Question LastQuestion { get; private set; }
+        // all properties made private
+        public readonly string Id;
+        // We do not need Name anymore to take a decision : public Name { get; }
+        private int _place;
+        private bool _isInPenaltyBox;
+        private int _goldCoins;
+        private string _expectedAnswer; // we do not need the full LastQuestion to take a decision, just the answer
+
+        public void Apply(Moved moved)
+        {
+            _place = moved.NewPlace;
+        }
+
+        public void Apply(QuestionAsked questionAsked)
+        {
+            _expectedAnswer = questionAsked.Answer;
+        }
 
         internal void CheckCanMove()
         {
-            if (this.LastQuestion != null)
+            if (!string.IsNullOrEmpty(this._expectedAnswer))
                 throw new Exception("Player already moved, need to answer now");
         }
 
         internal bool CannotGoOutOfPenaltyBox(int diceRoll) =>
-            IsInPenaltyBox && diceRoll % 2 == 0;
+            _isInPenaltyBox && diceRoll % 2 == 0;
 
         internal IEnumerable<IDomainEvent> Move(int diceRoll, QuestionsDeck questionsDeck)
         {
-            if (IsInPenaltyBox)
+            if (_isInPenaltyBox)
                 yield return new GetOutOfPenaltyBox(Id);
-            var newPlace = (Place + diceRoll) % 12;
+            var newPlace = (_place + diceRoll) % 12;
             yield return new Moved(Id, newPlace);
             yield return questionsDeck.Draw(newPlace);
         }
 
         internal IDomainEvent Answer(string answer)
         {
-            if (LastQuestion.Answer == answer)
-                return new GoldCoinEarned(Id, GoldCoins + 1);
-            else
-                return new GoneToPenaltyBox(Id);
+            if (_expectedAnswer == answer)
+                return new GoldCoinEarned(Id, _goldCoins + 1);
+            return new GoneToPenaltyBox(Id);
         }
     }
 }
