@@ -43,18 +43,19 @@ namespace EventSourcingCQRS.Tests
             Check.That(events).ContainsExactly(new PlayerAdded(playerId, "player1"), new CurrentPlayerChanged(playerId));
         }
 
-        //[Fact]
-        //public void AddAnotherPlayerWithoutChangingCurrentPlayer()
-        //{
-        //    var player1 = new Player("player1");
-        //    var game = GetGame(player1);
+        [Fact]
+        public void AddAnotherPlayerWithoutChangingCurrentPlayer()
+        {
+            var game = GetGame(
+                new GameStarted("gameId", "name", new List<GameCategory>()),
+                new PlayerAdded("p1Id", "player1"));
 
-        //    var events = game.AddPlayer("player2").ToArray();
+            var events = game.AddPlayer("player2").ToArray();
 
-        //    Check.That(events).CountIs(1);
-        //    var playerId = events.OfType<PlayerAdded>().First().PlayerId;
-        //    Check.That(events).ContainsExactly(new PlayerAdded(playerId, "player2"));
-        //}
+            Check.That(events).CountIs(1);
+            var playerId = events.OfType<PlayerAdded>().First().PlayerId;
+            Check.That(events).ContainsExactly(new PlayerAdded(playerId, "player2"));
+        }
 
         //[Fact]
         //public void MoveCurrentPlayer()
@@ -86,7 +87,7 @@ namespace EventSourcingCQRS.Tests
         //    var player1 = new Player("1", "player1");
         //    var player2 = new Player("2", "player2");
         //    var game = GetGame(player1, player2);
-            
+
         //    Check.ThatCode(() => game.Move(null, player2.Id).ToArray())
         //        .Throws<Exception>().WithMessage("It is not 2 turn!");
         //}
@@ -97,7 +98,7 @@ namespace EventSourcingCQRS.Tests
         //    var player1 = new Player("1", "player1", false, 0, 0, new Question(1, "some question", "its answer"));
         //    var player2 = new Player("2", "player2");
         //    var game = GetGame(player1, player2);
-            
+
         //    Check.ThatCode(() => game.Move(null, player1.Id).ToArray())
         //        .Throws<Exception>().WithMessage("Player already moved, need to answer now");
         //}

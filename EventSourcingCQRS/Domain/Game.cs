@@ -21,6 +21,11 @@ namespace EventSourcingCQRS.Domain
                 Id = gameStarted.GameId;
                 QuestionsDeck = new QuestionsDeck(gameStarted.GameCategories);
             }
+
+            public void Apply(PlayerAdded playerAdded)
+            {
+                Players.Add(new Player(playerAdded.PlayerId, playerAdded.PlayerName));
+            }
         }
 
         private readonly State _state = new State();
