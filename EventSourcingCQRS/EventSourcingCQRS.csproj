@@ -5,8 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Infra\createDatabase.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Infra\createDatabase.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="1.60.6" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.111" />
   </ItemGroup>
 

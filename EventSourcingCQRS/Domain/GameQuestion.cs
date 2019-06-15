@@ -7,9 +7,8 @@ namespace EventSourcingCQRS.Domain
             Question = question;
             NotUsed = notUsed;
         }
-
-        public int Id { get; }
-        public Question Question { get; }
+        
+        public Question Question { get; } // I use Question Read Model here...not really a good idea => to refactor
         public bool NotUsed { get; }
     }
 }
