@@ -1,8 +1,12 @@
 # Architecture / domain modelling styles
 
-This repository was created for a talk at [AlpesCraft](https://www.alpescraft.fr/).
+This repository was created for a talk at [AlpesCraft](https://www.alpescraft.fr/) and used in another talk on refactoring to DDD and Event Driven Architecture.
 
-Here are [slides in English](https://docs.google.com/presentation/d/1Msl5YVGeCy2psXepRe8phSBWBF_JIVLLrnkBydq-lvg/edit?usp=sharing) and [slides in French](https://docs.google.com/presentation/d/1Iryl3NYZjmAI8_9vd1r8XsbUG5FV1YmOQz-xzNJKFnM/edit?usp=sharing)
+Here are :
+
+- [slides around refactoring to DDD and Event Driven Architecture](https://docs.google.com/presentation/d/1gJvzkXb_-n93Sh8qHA9ROnuhImq3a3EnJkqJ-DQifsI/edit#slide=id.p)
+- [slides in English comparing different approaches](https://docs.google.com/presentation/d/1Msl5YVGeCy2psXepRe8phSBWBF_JIVLLrnkBydq-lvg/edit?usp=sharing)
+- [slides in French](https://docs.google.com/presentation/d/1Iryl3NYZjmAI8_9vd1r8XsbUG5FV1YmOQz-xzNJKFnM/edit?usp=sharing)
 
 Examples are all based on the [Trivia refactoring kata](https://github.com/jbrains/trivia) domain (but not on its legacy code, just domain). By the way, this refactoring kata is really great ;).
 
