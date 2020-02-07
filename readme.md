@@ -4,7 +4,7 @@ This repository was created for a talk at [AlpesCraft](https://www.alpescraft.fr
 
 Here are :
 
-- [slides around refactoring to DDD and Event Driven Architecture](https://docs.google.com/presentation/d/1gJvzkXb_-n93Sh8qHA9ROnuhImq3a3EnJkqJ-DQifsI/edit#slide=id.p)
+- [slides around refactoring to DDD and Event Driven Architecture](https://docs.google.com/presentation/d/1gJvzkXb_-n93Sh8qHA9ROnuhImq3a3EnJkqJ-DQifsI/edit?usp=sharing) + [video in French (from 36' around Event Driven Architecture)](https://www.youtube.com/watch?v=lnG9aKXh0T4)
 - [slides in English comparing different approaches](https://docs.google.com/presentation/d/1Msl5YVGeCy2psXepRe8phSBWBF_JIVLLrnkBydq-lvg/edit?usp=sharing)
 - [slides in French](https://docs.google.com/presentation/d/1Iryl3NYZjmAI8_9vd1r8XsbUG5FV1YmOQz-xzNJKFnM/edit?usp=sharing)
 
