@@ -18,7 +18,7 @@ namespace EventSourcingCQRS.Tests
             var gameStarted = Game.StartNew(questionsRepository, "test", new [] { "Sports", "Science" });
             
             Check.That(gameStarted.Name).IsEqualTo("test");
-            Check.That(gameStarted.GameCategories.Select(x => (x.Name, x.Questions.Count)))
+            Check.That(gameStarted.GameCategories.Select(x => (x.Name, x.Questions.Count())))
                 .ContainsExactly(("Sports", 50), ("Science", 50));
         }
 
